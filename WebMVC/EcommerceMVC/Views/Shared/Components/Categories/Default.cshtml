@@ -1,0 +1,24 @@
+﻿@model IEnumerable<EcommerceMVC.ViewModels.CategoriesVM>
+
+<div class="row g-4">
+    <div class="col-lg-4 text-start">
+        <h1>Our Organic Products</h1>
+    </div>
+    <div class="col-lg-8 text-end">
+        <ul class="nav nav-pills d-inline-flex text-center mb-5">
+            <li class="nav-item">
+                <a class="d-flex m-2 py-2 bg-light rounded-pill active" asp-controller="Home" asp-action="Index" asp-route-loai="">
+                    <span class="text-dark" style="width: 130px;">All Products</span>
+                </a>
+            </li>
+            @foreach (var item in Model)
+            {
+                <li class="nav-item">
+                    <a class="category-link d-flex py-2 m-2 bg-light rounded-pill" asp-controller="Home" asp-action="Index" asp-route-loai="@item.categoryCode">
+                        <span class="text-dark" style="width: 130px;">@item.categoryName</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

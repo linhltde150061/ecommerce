@@ -1,0 +1,41 @@
+﻿@model IEnumerable<EcommerceMVC.ViewModels.ProductsVM>
+
+<div class="row g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="rounded position-relative fruite-item">
+                <div class="fruite-img">
+                    <a asp-action="Detail" asp-controller="Home" asp-route-id="@item.ProductId">
+                        <img src="~/Hinh/HangHoa/@item.Img" class="img-fluid w-100 rounded-top" alt="@item.ProductName">
+                    </a>
+                </div>
+                <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">@item.categoryName</div>
+                <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                    <a asp-action="Detail" asp-controller="Home" asp-route-id="@item.ProductId">
+                        <h4>@item.ProductName</h4>
+                    </a>
+                    <p>@item.Depscription</p>
+                    <div class="d-flex justify-content-between flex-lg-wrap">
+                        <p class="text-dark fs-5 fw-bold mb-0">$@item.Price</p>
+                        <a asp-action="AddToCart" asp-controller="Cart" asp-route-id="@item.ProductId"
+                        class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="col-12">
+        <div class="pagination d-flex justify-content-center mt-5">
+            <a href="#" class="rounded">&laquo;</a>
+            <a href="#" class="active rounded">1</a>
+            <a href="#" class="rounded">2</a>
+            <a href="#" class="rounded">3</a>
+            <a href="#" class="rounded">4</a>
+            <a href="#" class="rounded">5</a>
+            <a href="#" class="rounded">6</a>
+            <a href="#" class="rounded">&raquo;</a>
+        </div>
+    </div>
+</div>

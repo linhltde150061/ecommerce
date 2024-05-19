@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<!-- Hero Start -->
+@RenderSection("Banner", required: false)
+
+<!-- Hero End -->
+<!-- Fruits Shop Start-->
+<div class="container-fluid fruite py-5">
+    <div class="container py-5">
+        <div class="tab-class text-center">
+            @await Component.InvokeAsync("Categories")
+            <div class="tab-content">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fruits Shop End-->
