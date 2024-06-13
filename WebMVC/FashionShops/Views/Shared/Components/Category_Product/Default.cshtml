@@ -1,0 +1,31 @@
+﻿@model IEnumerable<FashionShops.ViewModels.Product.ProductCategoryVM>
+@{
+    ViewData["Title"] = "Default";
+}
+
+<div class="widget widget-collapsible">
+    <h3 class="widget-title">
+        <a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">
+            Category
+        </a>
+    </h3><!-- End .widget-title -->
+
+    <div class="collapse show" id="widget-1">
+        <div class="widget-body">
+            <div class="filter-items filter-items-count">
+                @foreach (var item in Model)
+                {
+                    <div class="filter-item">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="category" class="custom-control-input" value="@item.Id" id="category_@item.Id">
+                            <label class="custom-control-label" for="category_@item.Id">@item.CategoryName</label>
+                        </div><!-- End .custom-checkbox -->
+                        <span class="item-count">@item.CountProduct</span>
+                    </div>
+
+                    <!-- End .filter-item -->
+                }
+            </div><!-- End .filter-items -->
+        </div><!-- End .widget-body -->
+    </div><!-- End .collapse -->
+</div><!-- End .widget -->

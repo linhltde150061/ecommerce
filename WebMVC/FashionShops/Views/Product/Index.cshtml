@@ -1,0 +1,166 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<main class="main">
+    <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+        <div class="container">
+            <h1 class="page-title">List Products<span>Fashion Shop</span></h1>
+        </div><!-- End .container -->
+    </div><!-- End .page-header -->
+    <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+        <div class="container">
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+
+    <div class="page-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9">
+                    <div class="toolbox">
+                        <div class="toolbox-left">
+                            <div class="toolbox-info">
+                                Showing <span>9 of 56</span> Products
+                            </div><!-- End .toolbox-info -->
+                        </div><!-- End .toolbox-left -->
+
+                        <div class="toolbox-right">
+                            <div class="toolbox-sort">
+                                <label for="sortby">Sort by:</label>
+                                <div class="select-custom">
+                                    <select name="sortby" id="sortby" class="form-control">
+                                        <option value="Date" selected="selected">Date</option>
+                                        <option value="Rated">Rated</option>
+                                    </select>
+                                </div>
+                            </div><!-- End .toolbox-sort -->
+                        </div><!-- End .toolbox-right -->
+                    </div><!-- End .toolbox -->
+
+                    <div class="products mb-3">
+                        <div class="row justify-content-center" id="products">
+                        </div><!-- End .row -->
+                    </div><!-- End .products -->
+
+
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
+                                    <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+                                </a>
+                            </li>
+                            <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item-total">of 6</li>
+                            <li class="page-item">
+                                <a class="page-link page-link-next" href="#" aria-label="Next">
+                                    Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div><!-- End .col-lg-9 -->
+                <aside class="col-lg-3 order-lg-first">
+                    <div class="sidebar sidebar-shop">
+                        <div class="widget widget-clean">
+                            <label>Filters:</label>
+                            <a href="" class="sidebar-filter-clear">Clean All</a>
+                        </div><!-- End .widget widget-clean -->
+                        @await Component.InvokeAsync("Category_Product")
+
+                        @await Component.InvokeAsync("Brand")
+
+                    </div><!-- End .sidebar sidebar-shop -->
+                </aside><!-- End .col-lg-3 -->
+            </div><!-- End .row -->
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+</main><!-- End .main -->
+@section JS {
+    <script>
+        $(function () {
+            LoadProduct();
+            $(document).on("change", "input[name=category], input[name=brand]", function (e) {
+                e.preventDefault();
+                LoadProduct();
+            })
+            $(document).on("click", ".sidebar-filter-clear", function (e) {
+                e.preventDefault();
+                $("input[name=category], input[name=brand]").trigger("change");
+            });
+            $("#sortby").change(function (e) {
+                e.preventDefault();
+                LoadProduct();
+            })
+            function LoadProduct() {
+                let categories = $("input[name=category]:checked").map(function () {
+                    return $(this).val();
+                }).get();
+                let brands = $("input[name=brand]:checked").map(function () {
+                    return $(this).val();
+                }).get();
+                let sortby = $("#sortby").val();
+                jQuery.ajaxSettings.traditional = true;
+                $.get("/Product/ListProduct", {
+                    Categories: categories,
+                    Brand: brands,
+                    OrderBy: sortby,
+                    Page: 1
+                },
+                    function (items) {
+                        console.log(items);
+                        $("#products").html("");
+                        items.forEach(function (element) {
+                            var picturesHtml = "";
+                            element.pictureColor.forEach(function (picture) {
+                                picturesHtml += 
+                                `<a href="/Product/Details/` + element.id + `">
+                                <img src="/image/product/` + picture + `" alt="product desc">
+                                </a>`;
+                            });
+                            var product =
+                                `<div class="col-6 col-md-4 col-lg-4 col-xl-3">
+                                <div class="product product-7 text-center">
+                                <figure class="product-media">
+                                <span class="product-label label-new">New</span>
+                                <a href="/Product/Details/` + element.id + `">
+                                <img src="/image/product/` + element.picture + `" alt="Product image" class="product-image">
+                                </a>
+                                <div class="product-action-vertical">
+                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                <a href="#" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                </div><!-- End .product-action-vertical -->
+                                <div class="product-action">
+                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                </div><!-- End .product-action -->
+                                </figure><!-- End .product-media -->
+                                <div class="product-body">
+                                <div class="product-cat">
+                                <a href="#">` + element.productCategory + `</a>
+                                </div><!-- End .product-cat -->
+                                <h3 class="product-title"><a href="/Product/Details/` + element.id + `">` + element.productName + `</a></h3><!-- End .product-title -->
+                                <div class="product-price">
+                                ` + element.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ` VNĐ
+                                </div><!-- End .product-price -->
+                                <div class="ratings-container">
+                                <div class="ratings">
+                                <div class="ratings-val" style="width: ` + element.voting * 20 + `%;"></div><!-- End .ratings-val -->
+                                </div><!-- End .ratings -->
+                                <span class="ratings-text">( ` + element.countVoting + ` Reviews )</span>
+                                </div><!-- End .rating-container -->
+                                <div class="product-nav product-nav-thumbs">
+                                ` + picturesHtml + `
+                                </div><!-- End .product-nav -->
+                                </div><!-- End .product-body -->
+                                </div><!-- End .product -->
+                                </div>`;
+                                $("#products").append(product);
+                        });
+                    });
+            };
+        });
+    </script>
+}
