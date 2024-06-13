@@ -1,0 +1,60 @@
+﻿@using FashionShops.ViewModels.News
+@model IEnumerable<NewsVM>
+@{
+    ViewData["Title"] = "Default";
+}
+
+<div class="related-posts">
+    <h3 class="title">Related Posts</h3><!-- End .title -->
+
+    <div class="owl-carousel owl-simple" data-toggle="owl"
+         data-owl-options='{
+                                "nav": false,
+                                "dots": true,
+                                "margin": 20,
+                                "loop": false,
+                                "responsive": {
+                                    "0": {
+                                        "items":1
+                                    },
+                                    "480": {
+                                        "items":2
+                                    },
+                                    "768": {
+                                        "items":3
+                                    },
+                                    "992": {
+                                        "items":4
+                                    }
+                                }
+                            }'>
+        @foreach (var item in Model)
+        {
+            <article class="entry entry-grid">
+                <figure class="entry-media">
+                    <a href="@Url.Action("Detail", "News", new{NewsId = item.Id})">
+                        <img src="/image/news/@item.Picture" alt="image desc">
+                    </a>
+                </figure><!-- End .entry-media -->
+
+                <div class="entry-body">
+                    <div class="entry-meta">
+                        <a href="#">@item.CreateDate</a>
+                        <span class="meta-separator">|</span>
+                        <a href="#">@item.CountComment Comments</a>
+                    </div><!-- End .entry-meta -->
+
+                    <h2 class="entry-title">
+                        <a href="">@item.Title</a>
+                    </h2><!-- End .entry-title -->
+
+                    <div class="entry-cats">
+                        in <a href="#">@item.NewsCategoryName</a>
+                    </div><!-- End .entry-cats -->
+                </div><!-- End .entry-body -->
+            </article>
+
+            <!-- End .entry -->
+        }
+    </div><!-- End .owl-carousel -->
+</div><!-- End .related-posts -->

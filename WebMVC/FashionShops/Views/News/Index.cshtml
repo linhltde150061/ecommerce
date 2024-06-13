@@ -1,0 +1,88 @@
+﻿@using FashionShops.ViewModels.News
+@model NewsInPageVM
+<main class="main">
+    <div class="page-header text-center" style="background-image: url('/assets/images/page-header-bg.jpg')">
+        <div class="container">
+            <h1 class="page-title">NEWS<span>Blog</span></h1>
+        </div><!-- End .container -->
+    </div><!-- End .page-header -->
+    <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+        <div class="container">
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+
+    <div class="page-content">
+        <div class="container">
+            @await Component.InvokeAsync("Category_News")
+
+            <div class="entry-container" data-layout="fitRows">
+                @foreach (var item in Model.NewsList)
+                {
+                    <div class="entry-item lifestyle shopping col-sm-6 col-lg-4">
+                        <article class="entry entry-mask">
+                            <figure class="entry-media">
+                                <a asp-action="Detail" asp-controller="News" asp-route-NewsId="@item.Id">
+                                    <img src="/image/News/@item.Picture" alt="image desc">
+                                </a>
+                            </figure><!-- End .entry-media -->
+
+                            <div class="entry-body">
+                                <div class="entry-meta">
+                                    <a href="#">@item.CreateDate</a>
+                                    <span class="meta-separator">|</span>
+                                    <a href="#">@item.CountComment Comments</a>
+                                </div><!-- End .entry-meta -->
+
+                                <h2 class="entry-title">
+                                    <a href="#">@item.Title</a>
+                                </h2><!-- End .entry-title -->
+
+                                <div class="entry-cats">
+                                    <a href="#">@item.NewsCategoryName</a>
+                                </div><!-- End .entry-cats -->
+                            </div><!-- End .entry-body -->
+                        </article><!-- End .entry -->
+                    </div>
+
+                    <!-- End .entry-item -->
+                }
+            </div><!-- End .entry-container -->
+
+            <div class="mb-3"></div><!-- End .mb-3 -->
+
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    @* Nút Prev *@
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link page-link-prev" href="@(Model.CurrentPage == 1 ? "#" : Url.Action("Index", "News", new { Page = 1, News_CategoryId = ViewBag.News_CategoryId }))" aria-label="Previous" tabindex="@(Model.CurrentPage == 1 ? "-1" : "")" aria-disabled="@(Model.CurrentPage == 1 ? "true" : "false")">
+                            <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span> Prev
+                        </a>
+                    </li>
+                    @{
+                        int start = 1, end = Model.TotalPage;
+                        if(Model.CurrentPage - 2 > 1)
+                        {
+                            start = Model.CurrentPage - 2;
+                        }
+                        if(Model.CurrentPage + 2 < Model.TotalPage)
+                        {
+                            end = Model.CurrentPage + 2;
+                        }
+                        for (int i = start; i <= end; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", "News", new { Page = i, News_CategoryId = ViewBag.News_CategoryId })">@i</a>
+                            </li>
+                        }
+                    }
+                    @* Nút Next *@
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPage ? "disabled" : "")">
+                        <a class="page-link page-link-next" href="@(Model.CurrentPage == Model.TotalPage ? "#" : Url.Action("Index", "News", new { Page = Model.TotalPage, News_CategoryId = ViewBag.News_CategoryId }))" aria-label="Next" tabindex="@(Model.CurrentPage == Model.TotalPage ? "-1" : "")" aria-disabled="@(Model.CurrentPage == Model.TotalPage ? "true" : "false")">
+                            Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+</main><!-- End .main -->

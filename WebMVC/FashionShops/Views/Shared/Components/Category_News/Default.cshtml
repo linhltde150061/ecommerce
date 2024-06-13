@@ -1,0 +1,15 @@
+﻿@using FashionShops.ViewModels.News
+@model IEnumerable<NewsCategoryVM>
+
+<nav class="blog-nav">
+    <ul class="menu-cat entry-filter justify-content-center">
+        <li><a asp-controller="News" asp-action="Index" asp-route-News_CategoryId=""
+            data-filter="*">All Blog Posts<span></span></a></li>
+        @foreach (var item in Model)
+        {
+            <li>
+                <a asp-controller="News" asp-action="Index" asp-route-News_CategoryId="@item.Id"
+                data-filter=".@item.Name.ToLower()">@item.Name<span>@item.CountNews</span></a></li>
+        }
+    </ul><!-- End .blog-menu -->
+</nav><!-- End .blog-nav -->
