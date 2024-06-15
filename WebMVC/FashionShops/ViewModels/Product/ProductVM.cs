@@ -11,5 +11,8 @@
         public string Voting { get; set; }
         public int CountVoting { get; set; }
         public List<string> PictureColor { get; set; } = new List<string>();
+        public int? ColorId { get; set; } 
+        public int? SizeId { get; set; }
+
     }
 }

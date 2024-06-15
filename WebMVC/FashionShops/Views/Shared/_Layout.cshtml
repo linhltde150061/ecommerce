@@ -28,6 +28,26 @@
     <!-- Main CSS File -->
     <link rel="stylesheet" href="~/assets/css/style.css">
     @RenderSection("Css", required: false)
+    <style>
+        .button {
+            display: inline-block;
+            padding: 15px 25px;
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+
+            .button:active {
+                box-shadow: 0 5px #666;
+                transform: translateY(4px);
+            }
+    </style>
 </head>
 
 <body>
@@ -324,7 +344,6 @@
             </div><!-- End .modal-content -->
         </div><!-- End .modal-dialog -->
     </div><!-- End .modal -->
-
     <!-- Plugins JS File -->
     <script src="~/assets/js/jquery.min.js"></script>
     <script src="~/assets/js/bootstrap.bundle.min.js"></script>
@@ -335,6 +354,179 @@
     <script src="~/assets/js/jquery.magnific-popup.min.js"></script>
     <!-- Main JS File -->
     <script src="~/assets/js/main.js"></script>
+    <script src="/assets/js/bootstrap-input-spinner.js"></script>
+    <script>
+        $(function () {
+            getCart();           
+            function getCart() {
+                $.get("/Cart/GetCart/",
+                    {},
+                    function (iCart) {
+                        $(".cart-count").html(iCart.length);
+                        $(".dropdown-cart-products").html("");
+                        var totalPrice = 0;
+                        for (let i = 0; i < iCart.length; i++) {
+                            var row = `<div class="product">
+                                <div class="product-cart-details">
+                                <h4 class="product-title">
+                                <a href="/Product/Details/`+ iCart[i].productId +`">`+ iCart[i].productName +`</a>
+                                </h4>
+                                <span class="cart-product-info">
+                                <span class="cart-product-qty">`+ iCart[i].amount + `</span>
+                                x `+ iCart[i].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") +` VND
+                                </span>
+                                </div><!-- End .product-cart-details -->
+                                <figure class="product-image-container">
+                                <a href="/Product/Details/`+ iCart[i].productId +`" class="product-image">
+                                <img src="/image/product/`+ iCart[i].picture + `" alt="product">
+                                </a>
+                                <div class="product-size">
+                                Size: `+ iCart[i].sizeName + `
+                                </div>
+                                </figure>
+                                <a href="#" data-product-id="`+ iCart[i].productId + `" data-color-id="` + iCart[i].colorId + `" data-size-id="` + iCart[i].sizeId + `"
+                                class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
+                                </div><!-- End .product -->`;
+                            totalPrice += iCart[i].price * iCart[i].amount;
+                            $(".dropdown-cart-products").append(row);
+                        }
+                        $(".cart-total-price").html(totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " VND");
+                    });
+            }
+
+            //======================================
+            getViewCart();
+            function getViewCart() {
+                $.get("/Cart/GetCart/",
+                    {},
+                    function (product) {
+                        console.log("san pham: ", product);
+                        // $(".cart-count").html(product.length);
+                        // $("#cart-items").html("");
+                        $('#cart-items').empty();
+                        for (let i = 0; i < product.length; i++) {
+                            var rowP = `<tr>
+                            <td class="product-col">
+                            <div class="product">
+                            <figure class="product-media">
+                            <a href="#">
+                            <img src="/image/product/`+ product[i].picture +`" alt="Product image">
+                            </a>
+                            </figure>
+                            <h3 class="product-title">
+                            <a href="/Product/Details/`+ product[i].productId +`">`+ product[i].productName +`</a>
+                            </h3><!-- End .product-title -->
+                            </div><!-- End .product -->
+                            </td>
+                            <td>`+ product[i].sizeName +`</td>
+                            <td class="price-col">`+ product[i].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") +`VND</td>
+                            <td class="quantity-col">
+                            <div class="cart-product-quantity">
+                            <input type="number" id="qty" class="form-control" value="`+ product[i].amount +`" min="1" max="`+ product[i].amountInShop +`" step="1" data-decimals="0" required>
+                            </div><!-- End .cart-product-quantity -->
+                            </td>
+                            <td class="total-col">`+ (product[i].price * product[i].amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") +`VND</td>
+                            <td class="remove-col"><a class="btn-remove"><i class="icon-close"></i></a></td>
+                            </tr>`;
+
+                            $('#cart-items').append(rowP);
+                        }
+                    });
+            }
+            //===================================
+            $('.btn-cart').click(function (e) {
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var colorId = $(".product-nav-thumbs a.active").data('color-id');
+                var sizeId = $("#size").val();
+                var amount = $("#qty").val();
+                addToCart(productId, colorId, sizeId, amount);
+            });
+
+            //===================================
+            $('#products').on('click', '.btn-cart', function (e) {
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var colorId = $(this).data('color-id');
+                var sizeId = $(this).data('size-id');
+                var amount = 1;
+                addToCart(productId, colorId, sizeId, amount);
+            });
+
+            //===================================
+            function addToCart(productId, colorId, sizeId, amount) {
+                $.get("/Cart/AddToCart/",
+                    {
+                        productId: productId,
+                        colorId: colorId,
+                        sizeId: sizeId,
+                        amount: amount
+                    },
+                    function (items) {
+                        getCart();
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        console.error("Failed to add to cart:", textStatus, errorThrown);
+                        alert("Failed to add to cart: " + textStatus);
+                    });
+            }
+
+            //===================================
+            $('.dropdown-cart-products').on('click', '.btn-remove', function (e) {
+                e.preventDefault();
+                var productId = $(this).data('product-id');
+                var colorId = $(this).data('color-id');
+                var sizeId = $(this).data('size-id');
+                removeICart(productId, colorId, sizeId);
+            });
+
+            //===================================
+            $(document).on('click', '.remove-col .btn-remove', function (e) {
+                e.preventDefault();
+                var productId = $('.dropdown-cart-products a.btn-remove').data('product-id');
+                var colorId = $('.dropdown-cart-products a.btn-remove').data('color-id');
+                var sizeId = $('.dropdown-cart-products a.btn-remove').data('size-id');
+                console.log(productId + "," + colorId + "," + sizeId);
+                removeICart(productId, colorId, sizeId);
+            });
+
+            //==========================================
+
+
+            //===================================
+            function removeICart(productId, colorId, sizeId) {
+                $.get("/Cart/RemoveICart/",
+                    {
+                        productId: productId,
+                        colorId: colorId,
+                        sizeId: sizeId,
+                    },
+                    function (items) {
+                        getCart();
+                        getViewCart();
+                    }).fail(function (jqXHR, textStatus, errorThrown) {
+                        console.error("Failed remove from cart:", textStatus, errorThrown);
+                        alert("Failed remove from cart: " + textStatus);
+                    });
+            }
+
+            //=========================================
+            function loadAmount(productId, colorId, sizeId) {
+                $.ajax({
+                    url: '/Product/LoadAmountProduct',
+                    type: 'GET',
+                    data: { productId: productId, colorId: colorId, sizeId: sizeId },
+                    success: function (response) {
+                        $('#quantity-value').empty();
+                        $('#quantity-value').text("_" + response);
+                        $('#qty').attr('max', response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+        });
+    </script>
     @RenderSection("JS", required: false)
 </body>
 </html>

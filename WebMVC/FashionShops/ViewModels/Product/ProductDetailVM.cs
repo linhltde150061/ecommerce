@@ -10,6 +10,7 @@
         public int CountVoting { get; set; }
         public string ProductCategory { get; set; }
         public List<dynamic> PictureColors { get; set; } = new List<dynamic>();
-        public List<string> listSizeName { get; set; } = new List<string>();
+        public List<int?> listSizeId { get; set; } = new List<int?>();
+        public int countProduct {  get; set; }
     }
 }
