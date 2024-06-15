@@ -1,6 +1,7 @@
 ﻿using FashionShops.Models;
 using FashionShops.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
@@ -58,6 +59,8 @@ namespace FashionShops.Controllers
                 Voting = product.ProductVotings.Where(v => v.ProductId == product.Id).Average(s => s.Star).ToString(),
                 CountVoting = product.ProductVotings.Where(v => v.ProductId == product.Id).Count(),
                 PictureColor = _context.ProductDetails.Where(p => p.ProductId == product.Id).Select(p => p.Picture).Distinct().ToList(),
+                ColorId = _context.ProductDetails.Where(p => p.ProductId == product.Id && p.Amount > 0).Select(p => p.ColorId).First(),
+                SizeId = _context.ProductDetails.Where(p => p.ProductId == product.Id && p.Amount > 0).Select(p => p.SizeId).First(),
             });
             return new JsonResult(data);
         }
@@ -79,8 +82,11 @@ namespace FashionShops.Controllers
                     ColorId = p.ColorId
                 })
                 .Distinct().Cast<dynamic>().ToList(),
-                //Size = _context.ProductSizes.Where(s => _context.ProductDetails.Where(p => p.ProductId == product.Id).GroupBy(c => c.ColorId)).Select(p => p.Size).ToList();
-            };
+                listSizeId = _context.ProductDetails
+                .Where(s => s.ProductId == product.Id && s.ColorId == _context.ProductDetails.FirstOrDefault(p => p.ProductId == product.Id).ColorId)
+                .Select(ls => ls.SizeId)
+                .ToList()
+        };
             return View(data);
         }
 
@@ -95,11 +101,19 @@ namespace FashionShops.Controllers
                 .Where(ps => listSizeId.Contains(ps.Id))
                 .Select(ps => ps.Size)
                 .ToList();
-            var data = new ProductDetailVM
+            var data = new
             {
-                listSizeName = sizeNames
+                SizeId = listSizeId,
+                SizeName = sizeNames
             };
-            return new JsonResult(sizeNames);
+            return new JsonResult(data);
+        }
+
+        public IActionResult LoadAmountProduct(int ProductId, int ColorId, int SizeId)
+        {
+            var countProduct = _context.ProductDetails.Where(p => p.ProductId == ProductId && p.ColorId == ColorId && p.SizeId == SizeId).Select(c => c.Amount);
+            
+            return new JsonResult(countProduct);
         }
     }
 }

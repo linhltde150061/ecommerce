@@ -12,11 +12,22 @@ namespace FashionShops
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddDbContext<FashionShopContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("FashionShop"));
             });
             var app = builder.Build();
+
+            app.UseSession();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

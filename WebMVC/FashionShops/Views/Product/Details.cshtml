@@ -61,9 +61,13 @@
                                 <div class="product-nav product-nav-thumbs">
                                     @foreach (var item in Model.PictureColors)
                                     {
-                                        <a class="color-btn" data-product-id="@Model.Id" data-color-id="@item.ColorId">
-                                            <img src="/image/product/@item.Picture" alt="product desc">
-                                        </a>
+                                        <a class="color-btn @if (item.ColorId == Model.PictureColors.First().ColorId)
+                                        {
+                                            <text>active</text>
+                                        }"
+                                            data-product-id="@Model.Id" data-color-id="@item.ColorId">
+                                                <img src="/image/product/@item.Picture" alt="product desc">
+                                            </a>
                                     }
                                 </div><!-- End .product-nav -->
                             </div><!-- End .details-filter-row -->
@@ -72,13 +76,13 @@
                                 <label for="size">Size:</label>
                                 <div class="select-custom">
                                     <select name="size" id="size" class="form-control">
-                                        <option value="s">S</option>
-                                        <option value="m">M</option>
-                                        <option value="l">L</option>
+                                        <option value="#" selected="selected">Select a size</option>
                                     </select>
                                 </div><!-- End .select-custom -->
                             </div><!-- End .details-filter-row -->
-
+                            <div class="details-filter-row details-row-size" id="product-quantity">
+                                <a>Product still available: </a><span id="quantity-value"> 0</span>
+                            </div>
                             <div class="details-filter-row details-row-size">
                                 <label for="qty">Qty:</label>
                                 <div class="product-details-quantity">
@@ -87,11 +91,10 @@
                             </div><!-- End .details-filter-row -->
 
                             <div class="product-details-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                <a href="#" data-product-id="@Model.Id" class="btn-product btn-cart button"><span>add to cart</span></a>
 
                                 <div class="details-action-wrapper">
                                     <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
-                                    <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
                                 </div><!-- End .details-action-wrapper -->
                             </div><!-- End .product-details-action -->
 
@@ -471,32 +474,64 @@
                 var productId = $(this).data('product-id');
                 var colorId = $(this).data('color-id');
 
+
+                $('.color-btn').removeClass('active');
+                $(this).addClass('active');
+
                 loadSize(productId, colorId);
+                loadAmount(productId, colorId, @Model.listSizeId.First());
             });
 
             function loadSize(productId, colorId) {
                 $.ajax({
-                    url: '/Product/LoadSize', 
+                    url: '/Product/LoadSize',
                     type: 'GET',
                     data: { productId: productId, colorId: colorId },
                     success: function (response) {
                         $('#size').empty();
-                        console.log("aaa", response);
-                        if (response.length > 0) {
-                            response.forEach(function (size) {
-                                $('#size').append('<option value="' + size + '">' + size + '</option>');
-                            });
+                        if (response.sizeId.length > 0) {
+                            for (var i = 0; i < response.sizeId.length; i++) {
+                                var sizeId = response.sizeId[i];
+                                var sizeName = response.sizeName[i];
+                                $('#size').append('<option value="' + sizeId + '">' + sizeName + '</option>');
+                            }
                         } else {
                             $('#size').append('<option value="">No sizes available</option>');
-                            
+
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error(error);
-                        console.log("aaaa");
                     }
                 });
             }
+
+            loadSize(@Model.Id, @Model.PictureColors.First().ColorId);
+
+            //Load số lượng sản phầm còn lại
+            $('#size').change(function () {
+                var sizeId = $(this).val();
+                if (sizeId) {
+                    loadAmount(@Model.Id, @Model.PictureColors.First().ColorId, sizeId);
+                }
+            });
+
+            function loadAmount(productId, colorId, sizeId) {
+                $.ajax({
+                    url: '/Product/LoadAmountProduct',
+                    type: 'GET',
+                    data: { productId: productId, colorId: colorId, sizeId: sizeId },
+                    success: function (response) {
+                        $('#quantity-value').empty();
+                        $('#quantity-value').text("_" + response);
+                        $('#qty').attr('max', response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+            loadAmount(@Model.Id, @Model.PictureColors.First().ColorId, @Model.listSizeId.First());
         });
 
     </script>

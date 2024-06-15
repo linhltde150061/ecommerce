@@ -110,7 +110,7 @@
                     Page: 1
                 },
                     function (items) {
-                        console.log(items);
+                        console.log("a", items);
                         $("#products").html("");
                         items.forEach(function (element) {
                             var picturesHtml = "";
@@ -130,11 +130,10 @@
                                 </a>
                                 <div class="product-action-vertical">
                                 <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                <a href="#" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                                <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
                                 </div><!-- End .product-action-vertical -->
                                 <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                <a href="#" class="btn-product btn-cart" data-product-id="`+ element.id + `" data-color-id="` + element.colorId + `" data-size-id="`+ element.sizeId +`"
+                                ><span>add to cart</span></a>
                                 </div><!-- End .product-action -->
                                 </figure><!-- End .product-media -->
                                 <div class="product-body">
